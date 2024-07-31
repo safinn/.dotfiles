@@ -1,0 +1,16 @@
+[settings]
+experimental = true
+
+[settings.status]
+missing_tools = "always"
+
+[tools]
+starship = "latest"
+node = "22"
+eza = "latest"
+fzf = "0.53"
+bat = "latest"
+lazygit = "latest"
+lazydocker = "latest"
+ripgrep = "latest"
+fd = "latest"
