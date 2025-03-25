@@ -102,10 +102,10 @@ defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
   '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 
-# rebuild zcompdump for autocompletions
-rm -f ~/.zcompdump
-compinit
 # Set up SSH agent
 eval $(ssh-agent -s)
 # source .zshrc
 source "$HOME/.zshrc"
+# rebuild zcompdump for autocompletions
+rm -f ~/.zcompdump
+compinit
