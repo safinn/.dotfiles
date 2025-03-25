@@ -164,6 +164,9 @@ defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
   '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 
+# Show Library folder
+chflags nohidden ~/Library
+
 # Restart system UI processes to apply changes
 killall Dock Finder SystemUIServer 2>/dev/null || true
 
