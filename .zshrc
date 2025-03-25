@@ -1,30 +1,51 @@
+# =============================================================================
+# Z Shell Configuration (.zshrc)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Environment Setup
+# -----------------------------------------------------------------------------
+# Initialize Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# Initialize mise (development tool version manager)
 eval "$($HOME/.local/bin/mise activate zsh)"
+# Initialize Starship prompt
 eval "$($HOME/.local/share/mise/shims/starship init zsh)"
-eval "$(rbenv init - zsh)"
-
+# Add Go binaries to PATH
 export PATH=$PATH:$(go env GOPATH)/bin
-
+# Load custom completions
 source ~/completions.zsh
 
+# -----------------------------------------------------------------------------
+# Aliases
+# -----------------------------------------------------------------------------
+# Editor
 alias v="nvim"
+# Docker tools
 alias dive='docker run -ti --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
+# Modern replacements
 alias ls='eza'
 alias cat='bat'
-
+# Git shortcuts
 alias gpsup='git push --set-upstream origin $(git_current_branch)'
 alias gloga='git log --oneline --decorate --graph --all'
 
+# -----------------------------------------------------------------------------
+# Git Functions
+# -----------------------------------------------------------------------------
+# Get current branch name
 function git_current_branch() {
   local ref
   ref=$(command git symbolic-ref --quiet HEAD 2>/dev/null)
   local ret=$?
   if [[ $ret != 0 ]]; then
-    [[ $ret == 128 ]] && return
+    [[ $ret == 128 ]] && return # Not in a git repo
     ref=$(command git rev-parse --short HEAD 2>/dev/null) || return
   fi
   echo ${ref#refs/heads/}
 }
 
+# Reset dev branch to origin
 function grhd() {
   if [[ $(git branch --show-current) == "dev" ]]; then
     git reset --hard origin/dev
@@ -33,7 +54,7 @@ function grhd() {
   fi
 }
 
-# Check if main exists and use instead of master
+# Detect main branch (main, trunk, master, etc.)
 function git_main_branch() {
   command git rev-parse --git-dir &>/dev/null || return
   local ref
@@ -49,7 +70,7 @@ function git_main_branch() {
   return 1
 }
 
-# Check for develop and similarly named branches
+# Detect development branch
 function git_develop_branch() {
   command git rev-parse --git-dir &>/dev/null || return
   local branch
@@ -64,9 +85,7 @@ function git_develop_branch() {
   return 1
 }
 
-# Copied and modified from James Roeder (jmaroeder) under MIT License
-# https://github.com/jmaroeder/plugin-git/blob/216723ef4f9e8dde399661c39c80bdf73f4076c4/functions/gbda.fish
-# Delete all branches merged in current HEAD, including squashed
+# Delete all branches merged in current HEAD, including squashed commits
 function gbds() {
   local default_branch=$(git_main_branch)
   ((!$?)) || default_branch=$(git_develop_branch)
@@ -80,12 +99,16 @@ function gbds() {
     done
 }
 
+# Delete all fully merged branches (excluding main/develop)
 function gbda() {
   git branch --no-color --merged | command grep -vE "^([+*]|\s*($(git_main_branch)|$(git_develop_branch))\s*$)" | command xargs git branch --delete 2>/dev/null
 }
 
-# Function to use gotestsum for 'go test' commands and regular go command for everything else
-go() {
+# -----------------------------------------------------------------------------
+# Development Tool Overrides
+# -----------------------------------------------------------------------------
+# Enhanced Go test function with gotestsum if available
+function go() {
   if [[ $1 == "test" ]]; then
     shift
     if command -v gotestsum >/dev/null 2>&1; then

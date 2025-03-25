@@ -1,83 +1,162 @@
-echo "Installing xcode-stuff"
-xcode-select --install
+#!/bin/bash
+# =============================================================================
+# Automated Mac Setup Script
+# =============================================================================
+# This script automates the setup of a new macOS system with development tools,
+# applications, and preferred system settings.
+# =============================================================================
 
-# Create directory if it doesn't exist
-mkdir -p ~/Documents/dev/repos
-if [ ! -d ~/Documents/dev/repos/zsh-completions ]; then
-  echo "Cloning zsh-completions into ~/Documents/dev/repos..."
-  git clone https://github.com/zsh-users/zsh-completions ~/Documents/dev/repos/zsh-completions
-fi
+# Exit on error
+set -e
 
-# Install Homebrew if not already installed
+echo "===== Starting Mac Setup ====="
+
+# -----------------------------------------------------------------------------
+# Install Xcode Command Line Tools
+# -----------------------------------------------------------------------------
+echo "Installing Xcode Command Line Tools..."
+# Install command line tools and suppress "already installed" error
+xcode-select --install 2>/dev/null || true
+
+# Wait for xcode-select installation to complete
+echo "Waiting for Xcode tools installation to complete..."
+until xcode-select -p &>/dev/null; do
+  sleep 2
+done
+until pkgutil --pkg-info=com.apple.pkg.CLTools_Executables &>/dev/null; do
+  sleep 2
+done
+echo "✅ Xcode Command Line Tools installed"
+
+# -----------------------------------------------------------------------------
+# Install Homebrew (must be installed before using brew commands)
+# -----------------------------------------------------------------------------
 if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew not detected. Installing Homebrew..."
+  echo "Installing Homebrew..."
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  # Add Homebrew to PATH for this session
+  if [[ $(uname -m) == "arm64" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 else
-  echo "Homebrew is already installed."
-  echo "Updating Homebrew..."
+  echo "Homebrew already installed. Updating..."
   brew update
 fi
 
-echo "Installing Brewfile packages..."
-brew bundle --file=./Brewfile
+# -----------------------------------------------------------------------------
+# Create development directories
+# -----------------------------------------------------------------------------
+echo "Setting up development directories..."
+mkdir -p ~/Documents/dev/repos
 
-echo "Copying dotfiles from Github"
+# Clone ZSH completions
+if [ ! -d ~/Documents/dev/repos/zsh-completions ]; then
+  echo "Cloning zsh-completions..."
+  git clone https://github.com/zsh-users/zsh-completions ~/Documents/dev/repos/zsh-completions
+fi
+
+# -----------------------------------------------------------------------------
+# Install Homebrew packages from Brewfile
+# -----------------------------------------------------------------------------
+echo "Installing packages from Brewfile..."
+if [ -f ./Brewfile ]; then
+  brew analytics off
+  brew bundle --file=./Brewfile
+else
+  echo "⚠️  Brewfile not found in current directory."
+fi
+
+# -----------------------------------------------------------------------------
+# Set up dotfiles
+# -----------------------------------------------------------------------------
+echo "Setting up dotfiles..."
 cd ~
-git clone git@github.com:safinn/.dotfiles.git
-cd .dotfiles
-echo "Running stow to link dotfiles..."
-stow .
+if [ ! -d ~/.dotfiles ]; then
+  # Try SSH first, fall back to HTTPS if it fails
+  if ! git clone git@github.com:safinn/.dotfiles.git 2>/dev/null; then
+    echo "SSH clone failed, trying HTTPS instead..."
+    git clone https://github.com/safinn/.dotfiles.git
+  fi
+fi
 
-cd ~
+if [ -d ~/.dotfiles ]; then
+  cd ~/.dotfiles
+  if command -v stow >/dev/null 2>&1; then
+    echo "Linking dotfiles with stow..."
+    stow .
+  else
+    echo "Installing stow..."
+    brew install stow
+    stow .
+  fi
+  cd ~
+else
+  echo "⚠️  Dotfiles installation failed. Check your network connection and Git access."
+fi
 
-# Install mise if not already installed
+# -----------------------------------------------------------------------------
+# Install mise (development tool version manager)
+# -----------------------------------------------------------------------------
 if ! command -v mise >/dev/null 2>&1; then
-  echo "mise not detected. Installing mise..."
-  curl https://mise.run | sh
-else
-  echo "mise is already installed."
+  echo "Installing mise version manager..."
+  curl -sSL https://mise.run | sh
+
+  # Add mise to current shell session
+  export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Install all mise tools
+# Install tools defined in .mise.toml
 if command -v mise >/dev/null 2>&1; then
-  echo "Installing mise tools..."
+  echo "Installing development tools with mise..."
   mise install
-else
-  echo "mise not found to install tools."
 fi
 
-echo "Set preferred mac settings"
+# -----------------------------------------------------------------------------
+# Configure macOS system preferences
+# -----------------------------------------------------------------------------
+echo "Setting macOS preferences..."
+
+# Keyboard settings
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults -currentHost write -g com.apple.keyboard.modifiermapping.1452-566-0 -array-add '
+  <dict>
+    <key>HIDKeyboardModifierMappingDst</key>
+    <integer>2</integer>
+    <key>HIDKeyboardModifierMappingSrc</key>
+    <integer>0</integer>
+  </dict>
+'
+
+# Mouse and trackpad
 defaults write -g com.apple.swipescrolldirection -bool false
-# Set dock to autohide
-defaults write com.apple.dock "autohide" -bool "true" && killall Dock
-# Save to disk by default, instead of iCloud
-defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-# Enable dark mode
-defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
-defaults write NSGlobalDomain AppleAccentColor -string "-1"
-defaults write NSGlobalDomain AppleHighlightColor -string \
-  "0.847059 0.847059 0.862745 Graphite"
-# Set menu bar clock format
-defaults write com.apple.menuextra.clock IsAnalog -bool false
-defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm"
-# Finder: show status bar
-defaults write com.apple.finder ShowStatusBar -bool true
-# Finder: show path bar
-defaults write com.apple.finder ShowPathbar -bool true
-# Keep folders on top when sorting by name
-defaults write com.apple.finder _FXSortFoldersFirst -bool true
-# Show hidden files in finder
-defaults write com.apple.finder "AppleShowAllFiles" -bool "true" && killall Finder
-# When performing a search, search the current folder by default
-defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-# View files as list
-defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-# Remove the auto-hiding Dock delay
+
+# Dock settings
+defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-delay -float 0
 
-# Set spotlight indexing order
+# General UI/UX
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+defaults write NSGlobalDomain AppleAccentColor -string "-1"
+defaults write NSGlobalDomain AppleHighlightColor -string "0.847059 0.847059 0.862745 Graphite"
+
+# Menu bar
+defaults write com.apple.menuextra.clock IsAnalog -bool false
+defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm"
+
+# Finder settings
+defaults write com.apple.finder ShowStatusBar -bool true
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+defaults write com.apple.finder AppleShowAllFiles -bool true
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Spotlight preferences
 defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 1;"name" = "APPLICATIONS";}' \
   '{"enabled" = 1;"name" = "MENU_CONVERSION";}' \
@@ -102,10 +181,32 @@ defaults write com.apple.spotlight orderedItems -array \
   '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
   '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 
-# Set up SSH agent
-eval $(ssh-agent -s)
-# source .zshrc
-source "$HOME/.zshrc"
-# rebuild zcompdump for autocompletions
+# Restart system UI processes to apply changes
+killall Dock Finder SystemUIServer 2>/dev/null || true
+
+# -----------------------------------------------------------------------------
+# Set up shell environment
+# -----------------------------------------------------------------------------
+# Start SSH agent
+echo "Starting SSH agent..."
+eval "$(ssh-agent -s)" 2>/dev/null
+
+# Source .zshrc if it exists
+if [ -f "$HOME/.zshrc" ]; then
+  echo "Loading shell configuration..."
+  source "$HOME/.zshrc" 2>/dev/null || true
+fi
+
+# Rebuild ZSH completion index
+echo "Updating ZSH completions..."
 rm -f ~/.zcompdump
-compinit
+if type compinit >/dev/null 2>&1; then
+  compinit
+else
+  echo "ZSH completions will be available in new terminal sessions"
+fi
+
+# -----------------------------------------------------------------------------
+# Finish up
+# -----------------------------------------------------------------------------
+echo "✅ Mac setup complete! Some changes may require a logout/restart to take effect."
