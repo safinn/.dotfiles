@@ -59,7 +59,7 @@ defaults write NSGlobalDomain AppleHighlightColor -string \
   "0.847059 0.847059 0.862745 Graphite"
 # Set menu bar clock format
 defaults write com.apple.menuextra.clock IsAnalog -bool false
-defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d h:mm a"
+defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm"
 # Finder: show status bar
 defaults write com.apple.finder ShowStatusBar -bool true
 # Finder: show path bar
