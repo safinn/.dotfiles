@@ -42,17 +42,6 @@ if [ ! -d ~/Documents/dev/repos/zsh-completions ]; then
 fi
 
 # -----------------------------------------------------------------------------
-# Install Homebrew packages from Brewfile
-# -----------------------------------------------------------------------------
-echo "Installing packages from Brewfile..."
-if [ -f ./Brewfile ]; then
-  brew analytics off
-  brew bundle --file=./Brewfile
-else
-  echo "⚠️  Brewfile not found in current directory."
-fi
-
-# -----------------------------------------------------------------------------
 # Set up dotfiles
 # -----------------------------------------------------------------------------
 echo "Setting up dotfiles..."
@@ -78,6 +67,17 @@ if [ -d ~/.dotfiles ]; then
   cd ~
 else
   echo "⚠️  Dotfiles installation failed. Check your network connection and Git access."
+fi
+
+# -----------------------------------------------------------------------------
+# Install Homebrew packages from Brewfile
+# -----------------------------------------------------------------------------
+echo "Installing packages from Brewfile..."
+if [ -f ./Brewfile ]; then
+  brew analytics off
+  brew bundle --file=./Brewfile
+else
+  echo "⚠️  Brewfile not found in current directory."
 fi
 
 # -----------------------------------------------------------------------------
