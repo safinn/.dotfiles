@@ -1,6 +1,5 @@
-eval "$(/Users/dimitris/.local/bin/mise activate zsh)"
-
-eval "$(/Users/dimitris/.local/share/mise/shims/starship init zsh)"
+eval "$($HOME/.local/bin/mise activate zsh)"
+eval "$($HOME/.local/share/mise/shims/starship init zsh)"
 eval "$(rbenv init - zsh)"
 
 export PATH=$PATH:$(go env GOPATH)/bin
@@ -10,21 +9,21 @@ source ~/completions.zsh
 alias v="nvim"
 alias dive='docker run -ti --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
 alias ls='eza'
-
-function git_current_branch () {
-        local ref
-        ref=$(command git symbolic-ref --quiet HEAD 2> /dev/null)
-        local ret=$?
-        if [[ $ret != 0 ]]
-        then
-                [[ $ret == 128 ]] && return
-                ref=$(command git rev-parse --short HEAD 2> /dev/null)  || return
-        fi
-        echo ${ref#refs/heads/}
-}
+alias cat='bat'
 
 alias gpsup='git push --set-upstream origin $(git_current_branch)'
 alias gloga='git log --oneline --decorate --graph --all'
+
+function git_current_branch() {
+  local ref
+  ref=$(command git symbolic-ref --quiet HEAD 2>/dev/null)
+  local ret=$?
+  if [[ $ret != 0 ]]; then
+    [[ $ret == 128 ]] && return
+    ref=$(command git rev-parse --short HEAD 2>/dev/null) || return
+  fi
+  echo ${ref#refs/heads/}
+}
 
 function grhd() {
   if [[ $(git branch --show-current) == "dev" ]]; then
@@ -70,9 +69,9 @@ function git_develop_branch() {
 # Delete all branches merged in current HEAD, including squashed
 function gbds() {
   local default_branch=$(git_main_branch)
-  (( ! $? )) || default_branch=$(git_develop_branch)
+  ((!$?)) || default_branch=$(git_develop_branch)
 
-  git for-each-ref refs/heads/ "--format=%(refname:short)" | \
+  git for-each-ref refs/heads/ "--format=%(refname:short)" |
     while read branch; do
       local merge_base=$(git merge-base $default_branch $branch)
       if [[ $(git cherry $default_branch $(git commit-tree $(git rev-parse $branch\^{tree}) -p $merge_base -m _)) = -* ]]; then
@@ -83,4 +82,18 @@ function gbds() {
 
 function gbda() {
   git branch --no-color --merged | command grep -vE "^([+*]|\s*($(git_main_branch)|$(git_develop_branch))\s*$)" | command xargs git branch --delete 2>/dev/null
+}
+
+# Function to use gotestsum for 'go test' commands and regular go command for everything else
+go() {
+  if [[ $1 == "test" ]]; then
+    shift
+    if command -v gotestsum >/dev/null 2>&1; then
+      command gotestsum --format-hide-empty-pkg -f dots -- "$@"
+    else
+      command go test "$@"
+    fi
+  else
+    command go "$@"
+  fi
 }
