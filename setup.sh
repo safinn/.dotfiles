@@ -115,9 +115,6 @@ defaults write com.apple.dock autohide-delay -float 0
 
 # General UI/UX
 defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
-defaults write NSGlobalDomain AppleAccentColor -string "-1"
-defaults write NSGlobalDomain AppleHighlightColor -string "0.847059 0.847059 0.862745 Graphite"
 
 # Menu bar
 defaults write com.apple.menuextra.clock IsAnalog -bool false
