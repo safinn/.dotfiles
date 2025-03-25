@@ -52,5 +52,52 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 15
 defaults write -g com.apple.swipescrolldirection -bool false
 # Set dock to autohide
 defaults write com.apple.dock "autohide" -bool "true" && killall Dock
+# Save to disk by default, instead of iCloud
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+# Enable dark mode
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+defaults write NSGlobalDomain AppleAccentColor -string "-1"
+defaults write NSGlobalDomain AppleHighlightColor -string \
+  "0.847059 0.847059 0.862745 Graphite"
+# Set menu bar clock format
+defaults write com.apple.menuextra.clock IsAnalog -bool false
+defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d h:mm a"
+# Finder: show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+# Finder: show path bar
+defaults write com.apple.finder ShowPathbar -bool true
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
 # Show hidden files in finder
 defaults write com.apple.finder "AppleShowAllFiles" -bool "true" && killall Finder
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+# View files as list
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+# Remove the auto-hiding Dock delay
+defaults write com.apple.dock autohide-delay -float 0
+
+# Set spotlight indexing order
+defaults write com.apple.spotlight orderedItems -array \
+  '{"enabled" = 1;"name" = "APPLICATIONS";}' \
+  '{"enabled" = 1;"name" = "MENU_CONVERSION";}' \
+  '{"enabled" = 1;"name" = "MENU_DEFINITION";}' \
+  '{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+  '{"enabled" = 1;"name" = "DIRECTORIES";}' \
+  '{"enabled" = 1;"name" = "DOCUMENTS";}' \
+  '{"enabled" = 1;"name" = "PDF";}' \
+  '{"enabled" = 0;"name" = "FONTS";}' \
+  '{"enabled" = 0;"name" = "MESSAGES";}' \
+  '{"enabled" = 0;"name" = "CONTACT";}' \
+  '{"enabled" = 0;"name" = "EVENT_TODO";}' \
+  '{"enabled" = 0;"name" = "IMAGES";}' \
+  '{"enabled" = 0;"name" = "BOOKMARKS";}' \
+  '{"enabled" = 0;"name" = "MUSIC";}' \
+  '{"enabled" = 0;"name" = "MOVIES";}' \
+  '{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+  '{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+  '{"enabled" = 0;"name" = "SOURCE";}' \
+  '{"enabled" = 0;"name" = "MENU_OTHER";}' \
+  '{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
+  '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
+  '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
