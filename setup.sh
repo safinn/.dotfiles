@@ -105,14 +105,6 @@ echo "Setting macOS preferences..."
 # Keyboard settings
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
-defaults -currentHost write -g com.apple.keyboard.modifiermapping.1452-566-0 -array-add '
-  <dict>
-    <key>HIDKeyboardModifierMappingDst</key>
-    <integer>2</integer>
-    <key>HIDKeyboardModifierMappingSrc</key>
-    <integer>0</integer>
-  </dict>
-'
 
 # Mouse and trackpad
 defaults write -g com.apple.swipescrolldirection -bool false
