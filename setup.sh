@@ -28,6 +28,8 @@ cd .dotfiles
 echo "Running stow to link dotfiles..."
 stow .
 
+cd ~
+
 # Install mise if not already installed
 if ! command -v mise >/dev/null 2>&1; then
   echo "mise not detected. Installing mise..."
