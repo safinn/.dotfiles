@@ -12,23 +12,6 @@ set -e
 echo "===== Starting Mac Setup ====="
 
 # -----------------------------------------------------------------------------
-# Install Xcode Command Line Tools
-# -----------------------------------------------------------------------------
-echo "Installing Xcode Command Line Tools..."
-# Install command line tools and suppress "already installed" error
-xcode-select --install 2>/dev/null || true
-
-# Wait for xcode-select installation to complete
-echo "Waiting for Xcode tools installation to complete..."
-until xcode-select -p &>/dev/null; do
-  sleep 2
-done
-until pkgutil --pkg-info=com.apple.pkg.CLTools_Executables &>/dev/null; do
-  sleep 2
-done
-echo "✅ Xcode Command Line Tools installed"
-
-# -----------------------------------------------------------------------------
 # Install Homebrew (must be installed before using brew commands)
 # -----------------------------------------------------------------------------
 if ! command -v brew >/dev/null 2>&1; then
