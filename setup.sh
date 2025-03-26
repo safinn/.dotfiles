@@ -166,12 +166,6 @@ killall Dock Finder SystemUIServer 2>/dev/null || true
 echo "Starting SSH agent..."
 eval "$(ssh-agent -s)" 2>/dev/null
 
-# Source .zshrc if it exists
-if [ -f "$HOME/.zshrc" ]; then
-  echo "Loading shell configuration..."
-  source "$HOME/.zshrc" 2>/dev/null || true
-fi
-
 # Rebuild ZSH completion index
 echo "Updating ZSH completions..."
 rm -f ~/.zcompdump
