@@ -73,11 +73,11 @@ fi
 # Install Homebrew packages from Brewfile
 # -----------------------------------------------------------------------------
 echo "Installing packages from Brewfile..."
-if [ -f ./Brewfile ]; then
+if [ -f ~/.dotfiles/Brewfile ]; then
   brew analytics off
-  brew bundle --file=./Brewfile
+  brew bundle --file=~/.dotfiles/Brewfile
 else
-  echo "⚠️  Brewfile not found in current directory."
+  echo "⚠️  Brewfile not found in ~/.dotfiles directory."
 fi
 
 # -----------------------------------------------------------------------------
