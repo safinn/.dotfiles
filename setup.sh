@@ -178,4 +178,4 @@ fi
 # -----------------------------------------------------------------------------
 # Finish up
 # -----------------------------------------------------------------------------
-echo "✅ Mac setup complete! Some changes may require a logout/restart to take effect."
+echo "✅ Mac setup complete! Logout/restart to take effect."
