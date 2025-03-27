@@ -1,7 +1,9 @@
 [user]
   name = Dimitris
   email = safinn@users.noreply.github.com
-  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH3kCjftm/LLNr30jNhTJ85R/XnkGnQFW7ZqxyUeBy4Y
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1jZxfBRyqjDiRSjA1gp+CuyqbEkTjK7M26dTrXMNMH
+[includeIf "gitdir:riskledger/"]
+  path = config.work
 [init]
   defaultBranch = main
 [gpg]
