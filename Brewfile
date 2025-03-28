@@ -1,6 +1,7 @@
 brew "stow"
 brew "git"
 brew "zsh"
+brew "gpg"
 cask "bruno"
 cask "dbeaver-community"
 cask "docker"
