@@ -16,7 +16,7 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # Load custom completions
 source ~/completions.zsh
 # Don't add commands that start with a space to history
-export HISTCONTROL=ignorespace
+setopt histignorespace
 
 # -----------------------------------------------------------------------------
 # Aliases
