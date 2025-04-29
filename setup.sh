@@ -80,6 +80,27 @@ else
   echo "⚠️  Brewfile not found in ~/.dotfiles directory."
 fi
 
+# Install a browser
+echo "Which browser would you like to install?"
+echo "1) Google Chrome"
+echo "2) Firefox"
+read -p "Enter the number of your choice: " browser_choice
+
+temp_brewfile=$(mktemp)
+
+if [[ "$browser_choice" == "1" ]]; then
+  echo "cask 'google-chrome'" >> "$temp_brewfile"
+elif [[ "$browser_choice" == "2" ]]; then
+  echo "cask 'firefox'" >> "$temp_brewfile"
+else
+  echo "Invalid choice. Exiting."
+  rm "$temp_brewfile"
+  exit 1
+fi
+
+brew bundle --file="$temp_brewfile"
+rm "$temp_brewfile"
+
 # Optional brew tools
 read -p "Do you want to include optional tools? (y/n): " include_optional
 
