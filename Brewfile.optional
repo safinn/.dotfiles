@@ -1,0 +1,4 @@
+brew "gpg"
+cask "docker"
+cask "bruno"
+cask "dbeaver-community"
