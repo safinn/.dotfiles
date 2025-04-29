@@ -80,6 +80,13 @@ else
   echo "⚠️  Brewfile not found in ~/.dotfiles directory."
 fi
 
+# Optional brew tools
+read -p "Do you want to include optional tools? (y/n): " include_optional
+
+if [[ "$include_optional" == "y" ]]; then
+  brew bundle --file=~/.dotfiles/Brewfile.optional
+fi
+
 # -----------------------------------------------------------------------------
 # Install mise (development tool version manager)
 # -----------------------------------------------------------------------------
