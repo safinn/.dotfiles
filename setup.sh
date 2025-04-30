@@ -92,10 +92,11 @@ if [[ "$browser_choice" == "1" ]]; then
   echo "cask 'google-chrome'" >> "$temp_brewfile"
 elif [[ "$browser_choice" == "2" ]]; then
   echo "cask 'firefox'" >> "$temp_brewfile"
-else
-  echo "Invalid choice. Exiting."
-  rm "$temp_brewfile"
-  exit 1
+fi
+
+read -p "Do you want to install AeroSpace? (y/n): " include_aerospace
+if [[ "$include_optional" == "y" ]]; then
+  echo "cask 'nikitabobko/tap/aerospace'" >> "$temp_brewfile"
 fi
 
 brew bundle --file="$temp_brewfile"
@@ -143,6 +144,7 @@ defaults write com.apple.dock autohide-delay -float 0
 
 # General UI/UX
 defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults write com.apple.spaces spans-displays -bool true
 
 # Menu bar
 defaults write com.apple.menuextra.clock IsAnalog -bool false
