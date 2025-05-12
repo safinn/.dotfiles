@@ -145,6 +145,7 @@ defaults write com.apple.dock autohide-delay -float 0
 # General UI/UX
 defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 defaults write com.apple.spaces spans-displays -bool true
+defaults write com.apple.dock appswitcher-all-displays -bool true
 
 # Menu bar
 defaults write com.apple.menuextra.clock IsAnalog -bool false
