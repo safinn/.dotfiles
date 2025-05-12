@@ -1,5 +1,7 @@
 fpath=(~/Documents/dev/repos/zsh-completions/src $fpath)
 autoload -U compinit; compinit
+autoload bashcompinit; bashcompinit
+complete -C aws_completer aws
 
 zstyle ':completion:*' completer _extensions _complete _approximate
 
